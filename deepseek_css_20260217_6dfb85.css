@@ -1,0 +1,582 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+/* Contenedor principal */
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+.header {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+@media (min-width: 768px) {
+    .header {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
+
+.header h1 {
+    color: #667eea;
+    font-size: 24px;
+    text-align: center;
+}
+
+.btn-add {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: background 0.3s;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .btn-add {
+        width: auto;
+    }
+}
+
+.btn-add:hover {
+    background: #764ba2;
+}
+
+.btn-add.danger {
+    background: #f56565;
+}
+
+.btn-add.danger:hover {
+    background: #c53030;
+}
+
+/* Obras grid */
+.obras-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+@media (min-width: 640px) {
+    .obras-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.obra-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    transition: transform 0.3s;
+    position: relative;
+}
+
+.obra-card:hover {
+    transform: translateY(-5px);
+}
+
+.delete-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #f56565;
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+}
+
+.delete-btn:hover {
+    background: #c53030;
+}
+
+/* Ventana de obra */
+.obra-window {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    z-index: 9000;
+    overflow-y: auto;
+    display: none;
+}
+
+.obra-window.active {
+    display: block;
+}
+
+.obra-header {
+    background: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 9001;
+}
+
+@media (min-width: 768px) {
+    .obra-header {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+}
+
+.obra-header h2 {
+    color: #667eea;
+    font-size: 22px;
+}
+
+.obra-header-buttons {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .obra-header-buttons {
+        width: auto;
+    }
+}
+
+.btn-back {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    flex: 1;
+}
+
+.obra-content {
+    padding: 20px;
+}
+
+/* Tabs */
+.tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 20px;
+    background: white;
+    padding: 10px;
+    border-radius: 30px;
+    overflow-x: auto;
+}
+
+.tab {
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 25px;
+    transition: all 0.3s;
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.tab.active {
+    background: #667eea;
+    color: white;
+}
+
+/* Grid de personajes */
+.personajes-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+@media (min-width: 640px) {
+    .personajes-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+.personaje-card {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-left: 8px solid;
+    position: relative;
+}
+
+.personaje-card.masculino {
+    border-left-color: #4299e1;
+}
+
+.personaje-card.femenino {
+    border-left-color: #ed64a6;
+}
+
+.personaje-actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.btn-icon:hover {
+    background: #e2e8f0;
+}
+
+.btn-relacion {
+    background: #48bb78;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 10px;
+    width: 100%;
+}
+
+.btn-delete-personaje {
+    background: #f56565;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 20000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    color: #667eea;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+.personaje-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.personaje-opcion {
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.personaje-opcion:hover {
+    border-color: #667eea;
+    transform: scale(1.05);
+}
+
+.personaje-opcion.masculino {
+    border-left: 5px solid #4299e1;
+}
+
+.personaje-opcion.femenino {
+    border-left: 5px solid #ed64a6;
+}
+
+/* Árbol de relaciones */
+.arbol-container {
+    background: #2d3748;
+    border-radius: 15px;
+    padding: 30px;
+    overflow-x: auto;
+    min-height: 600px;
+}
+
+.red-relaciones {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    min-width: 800px;
+}
+
+.nodo-principal {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.conexiones-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    justify-content: center;
+    position: relative;
+}
+
+.relacion-grupo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    min-width: 150px;
+}
+
+/* Iconos de persona */
+.personaje-icono {
+    width: 120px;
+    background: white;
+    border-radius: 15px;
+    padding: 15px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.personaje-icono:hover {
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.personaje-icono.seleccionado {
+    box-shadow: 0 0 0 3px #fbbf24;
+}
+
+.personaje-icono.masculino {
+    border-top: 5px solid #4299e1;
+}
+
+.personaje-icono.femenino {
+    border-top: 5px solid #ed64a6;
+}
+
+.icono-persona {
+    font-size: 40px;
+}
+
+.icono-persona.masculino {
+    color: #4299e1;
+}
+
+.icono-persona.femenino {
+    color: #ed64a6;
+}
+
+.personaje-icono .nombre {
+    font-weight: bold;
+    text-align: center;
+    font-size: 14px;
+}
+
+.personaje-icono .edad {
+    font-size: 12px;
+    color: #666;
+}
+
+/* Líneas de conexión */
+.linea-familiar { 
+    background: #48bb78; 
+}
+
+.linea-pareja { 
+    background: #ed64a6; 
+}
+
+.linea-amistad { 
+    background: #4299e1; 
+    border-top: 2px dashed #4299e1 !important;
+}
+
+.linea-enemistad { 
+    background: #f56565; 
+    border-top: 2px dashed #f56565 !important;
+}
+
+.linea-default { 
+    background: #718096; 
+    border-top: 2px dashed #718096 !important;
+}
+
+.linea-vertical {
+    width: 2px;
+    height: 40px;
+    margin: 5px auto;
+}
+
+.linea-horizontal-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+    width: 100%;
+}
+
+.linea-horizontal {
+    flex: 1;
+    height: 2px;
+}
+
+/* Líneas punteadas para ciertas relaciones */
+.linea-amistad.linea-horizontal,
+.linea-enemistad.linea-horizontal,
+.linea-default.linea-horizontal {
+    height: 0;
+    border-top: 2px dashed;
+    background: transparent;
+}
+
+.linea-amistad.linea-vertical,
+.linea-enemistad.linea-vertical,
+.linea-default.linea-vertical {
+    width: 2px;
+    height: 40px;
+    background: transparent;
+    border-left: 2px dashed;
+}
+
+/* Leyenda */
+.leyenda {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
+
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.color-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+}
+
+.linea-muestra {
+    width: 30px;
+    height: 2px;
+}
+
+.linea-muestra.punteada {
+    height: 0;
+    border-top: 2px dashed;
+}
+
+.empty-message {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 15px;
+    color: #718096;
+}
