@@ -107,6 +107,11 @@ body {
     background: #764ba2;
 }
 
+.btn-add.small {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
 .btn-add.danger {
     background: #f56565;
 }
@@ -324,6 +329,13 @@ body {
     padding: 25px;
     width: 90%;
     max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    color: #667eea;
+    margin-bottom: 20px;
 }
 
 .form-group {
@@ -344,121 +356,94 @@ body {
     border-radius: 10px;
 }
 
-    /* Árbol genealógico */
-.arbol-container {
+/* Mapa de relaciones */
+.mapa-container {
     background: #2d3748;
     border-radius: 15px;
-    padding: 30px;
     min-height: 600px;
-    overflow-x: auto;
-}
-
-.arbol {
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-}
-
-.familia {
-    background: rgba(255,255,255,0.05);
-    border-radius: 15px;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-}
-
-.generacion {
-    display: flex;
-    gap: 40px;
-    justify-content: center;
-    flex-wrap: wrap;
     position: relative;
+    overflow: hidden;
+    border: 2px solid #4a5568;
 }
 
-.personaje-nodo {
-    width: 120px;
+.controles-mapa {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    margin-bottom: 15px;
+    background: white;
+    padding: 10px 20px;
+    border-radius: 30px;
+}
+
+.info-mapa {
+    color: #718096;
+    font-size: 14px;
+}
+
+.linea-relacion {
+    position: absolute;
+    height: 2px;
+    transform-origin: 0 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.nodo-personaje {
+    position: absolute;
+    width: 100px;
     background: white;
     border-radius: 15px;
-    padding: 15px;
+    padding: 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 5px;
-    position: relative;
+    cursor: move;
+    user-select: none;
+    z-index: 2;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: box-shadow 0.3s;
 }
 
-.personaje-nodo.masculino {
+.nodo-personaje:active {
+    cursor: grabbing;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+}
+
+.nodo-personaje.masculino {
     border-top: 5px solid #4299e1;
 }
 
-.personaje-nodo.femenino {
+.nodo-personaje.femenino {
     border-top: 5px solid #ed64a6;
 }
 
-.icono {
-    font-size: 40px;
+.nodo-personaje .icono {
+    font-size: 30px;
 }
 
-.icono.masculino {
-    color: #4299e1;
-}
-
-.icono.femenino {
-    color: #ed64a6;
-}
-
-.nombre {
+.nodo-personaje .nombre {
     font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
 }
 
-.edad {
-    font-size: 12px;
+.nodo-personaje .edad {
+    font-size: 10px;
     color: #666;
 }
 
-.linea-padre {
+/* Tooltip */
+.tooltip {
     position: absolute;
-    top: -30px;
-    left: 50%;
-    width: 2px;
-    height: 30px;
-    background: #48bb78;
-    transform: translateX(-50%);
-}
-
-.linea-hermano {
-    position: absolute;
-    top: 50%;
-    right: -40px;
-    width: 40px;
-    height: 2px;
-    background: #4299e1;
-    transform: translateY(-50%);
-}
-
-/* Para el último hermano, no mostrar línea */
-.personaje-nodo:last-child .linea-hermano {
-    display: none;
-}
-
-.leyenda {
-    background: white;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.leyenda-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    pointer-events: none;
+    z-index: 3;
 }
 
 .empty-message {
