@@ -3,25 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestor de Personajes</title>
+    <title>Gestor de Personajes - Completo</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Splash Screen -->
-    <div class="splash" id="splash">
-        <div class="splash-content">
-            <div class="splash-icon">📚✨</div>
-            <div class="splash-title">Gestor de Personajes</div>
-            <div class="splash-subtitle">Para escritores creativos</div>
-        </div>
-    </div>
-
     <!-- Contenedor principal -->
-    <div class="container" id="mainContainer" style="display: none;">
+    <div class="container" id="mainContainer">
         <div class="header">
             <h1>📖 Mis Obras Literarias</h1>
-            <button class="btn" onclick="showModal('obraModal')">+ Nueva Obra</button>
+            <div class="header-buttons">
+                <button class="btn" onclick="showModal('obraModal')">+ Nueva Obra</button>
+                <button class="btn secondary" onclick="showImportModal()">📥 Importar</button>
+                <button class="btn secondary" onclick="exportObras()">📤 Exportar</button>
+            </div>
         </div>
+
+        <!-- Barra de búsqueda -->
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="🔍 Buscar obras o personajes..." oninput="filterContent()">
+            <select id="filterType" onchange="filterContent()">
+                <option value="all">Todos</option>
+                <option value="obras">Solo obras</option>
+                <option value="personajes">Solo personajes</option>
+            </select>
+        </div>
+
         <div class="obras-grid" id="obrasGrid"></div>
     </div>
 
@@ -32,12 +38,47 @@
                 <h2 id="obraTitle"></h2>
                 <div class="view-header-buttons">
                     <button class="btn back small" onclick="backToObras()">← Volver</button>
+                    <button class="btn small" onclick="showTimeline()">📅 Línea de tiempo</button>
+                    <button class="btn small" onclick="showGallery()">🖼️ Galería</button>
                     <button class="btn small" onclick="showModal('personajeModal')">+ Personaje</button>
                 </div>
             </div>
 
-            <div id="personajesContainer">
+            <!-- Pestañas -->
+            <div class="tabs">
+                <div class="tab active" onclick="switchTab('lista')">Lista</div>
+                <div class="tab" onclick="switchTab('galeria')">Galería</div>
+                <div class="tab" onclick="switchTab('timeline')">Línea de tiempo</div>
+                <div class="tab" onclick="switchTab('comparativa')">Comparativa</div>
+            </div>
+
+            <!-- Vista Lista -->
+            <div id="listaView" class="tab-content active">
                 <div class="personajes-grid" id="personajesGrid"></div>
+            </div>
+
+            <!-- Vista Galería -->
+            <div id="galeriaView" class="tab-content">
+                <div class="galeria-grid" id="galeriaGrid"></div>
+            </div>
+
+            <!-- Vista Línea de tiempo -->
+            <div id="timelineView" class="tab-content">
+                <div class="timeline-controls">
+                    <button class="btn small" onclick="sortTimeline('asc')">↑ Ascendente</button>
+                    <button class="btn small" onclick="sortTimeline('desc')">↓ Descendente</button>
+                </div>
+                <div class="timeline" id="timelineContainer"></div>
+            </div>
+
+            <!-- Vista Comparativa -->
+            <div id="comparativaView" class="tab-content">
+                <div class="comparativa-selector">
+                    <select id="compare1" onchange="updateComparison()"></select>
+                    <span>vs</span>
+                    <select id="compare2" onchange="updateComparison()"></select>
+                </div>
+                <div class="comparativa-container" id="comparisonContainer"></div>
             </div>
         </div>
     </div>
@@ -45,18 +86,19 @@
     <!-- Modal Obra -->
     <div class="modal" id="obraModal">
         <div class="modal-content">
-            <h2>📕 Nueva Obra</h2>
+            <h2>📕 ${obra ? 'Editar' : 'Nueva'} Obra</h2>
+            <input type="hidden" id="obraId">
             <div class="form-group">
-                <label>Título de la obra</label>
+                <label>Título</label>
                 <input type="text" id="obraTitulo" placeholder="Ej: Cien años de soledad">
             </div>
             <div class="form-group">
-                <label>Género literario</label>
-                <input type="text" id="obraGenero" placeholder="Ej: Novela, Drama, Fantasía">
+                <label>Género</label>
+                <input type="text" id="obraGenero" placeholder="Ej: Novela">
             </div>
             <div class="form-group">
                 <label>Descripción</label>
-                <textarea id="obraDescripcion" placeholder="Breve descripción de la obra..." rows="3"></textarea>
+                <textarea id="obraDescripcion" placeholder="Descripción..." rows="3"></textarea>
             </div>
             <div class="modal-buttons">
                 <button class="btn" onclick="saveObra()">Guardar</button>
@@ -70,25 +112,65 @@
         <div class="modal-content">
             <h2 id="personajeModalTitle">👤 Nuevo Personaje</h2>
             <input type="hidden" id="personajeId">
-            <div class="form-group">
-                <label>Nombre</label>
-                <input type="text" id="personajeNombre" placeholder="Ej: Remedios la bella">
+            
+            <div class="form-row">
+                <div class="form-group" style="flex: 2;">
+                    <label>Nombre</label>
+                    <input type="text" id="personajeNombre" placeholder="Nombre completo">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Apellido</label>
+                    <input type="text" id="personajeApellido" placeholder="Apellido">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Género</label>
-                <select id="personajeGenero">
-                    <option value="masculino">Masculino</option>
-                    <option value="femenino">Femenino</option>
-                </select>
+
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label>Género</label>
+                    <select id="personajeGenero">
+                        <option value="masculino">Masculino</option>
+                        <option value="femenino">Femenino</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Edad</label>
+                    <input type="number" id="personajeEdad" placeholder="Edad">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Estado</label>
+                    <select id="personajeEstado">
+                        <option value="vivo">Vivo</option>
+                        <option value="muerto">Muerto</option>
+                    </select>
+                </div>
             </div>
+
             <div class="form-group">
-                <label>Edad</label>
-                <input type="number" id="personajeEdad" placeholder="Ej: 25">
+                <label>Avatar URL</label>
+                <input type="text" id="personajeAvatar" placeholder="https://ejemplo.com/avatar.jpg">
             </div>
+
             <div class="form-group">
                 <label>Descripción</label>
-                <textarea id="personajeDescripcion" placeholder="Describe al personaje..." rows="3"></textarea>
+                <textarea id="personajeDescripcion" placeholder="Describe al personaje..." rows="2"></textarea>
             </div>
+
+            <div class="form-group">
+                <label>Notas y citas</label>
+                <textarea id="personajeNotas" placeholder="Notas importantes, citas famosas..." rows="3"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>Año de nacimiento</label>
+                <input type="number" id="personajeNacimiento" placeholder="Ej: 1920">
+            </div>
+
+            <div class="form-group">
+                <label>Año de muerte (si aplica)</label>
+                <input type="number" id="personajeMuerte" placeholder="Ej: 2000">
+            </div>
+
             <div class="modal-buttons">
                 <button class="btn" onclick="savePersonaje()">Guardar</button>
                 <button class="btn secondary" onclick="hideModal('personajeModal')">Cancelar</button>
@@ -132,17 +214,61 @@
         </div>
     </div>
 
+    <!-- Modal Importar -->
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <h2>📥 Importar</h2>
+            <div class="form-group">
+                <label>Seleccionar archivo JSON</label>
+                <input type="file" id="importFile" accept=".json" onchange="handleFileImport()">
+            </div>
+            <div class="form-group">
+                <label>O pegar JSON</label>
+                <textarea id="importJson" placeholder='Pega el JSON aquí...' rows="5"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="importFromText()">Importar</button>
+                <button class="btn secondary" onclick="hideModal('importModal')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Personaje Expandido -->
+    <div class="modal" id="personajeExpandidoModal">
+        <div class="modal-content large">
+            <div id="personajeExpandidoContent"></div>
+            <div class="modal-buttons">
+                <button class="btn secondary" onclick="hideModal('personajeExpandidoModal')">Cerrar</button>
+                <button class="btn" onclick="printPersonaje()">🖨️ Imprimir</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Historial -->
+    <div class="modal" id="historialModal">
+        <div class="modal-content">
+            <h2>📋 Historial de cambios</h2>
+            <div class="historial-list" id="historialList"></div>
+            <div class="modal-buttons">
+                <button class="btn secondary" onclick="hideModal('historialModal')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Confirmar -->
     <div class="modal" id="confirmModal">
         <div class="modal-content">
             <h2>⚠️ Confirmar</h2>
-            <p id="confirmMessage" style="margin: 20px 0; color: #4a5568;">¿Estás seguro?</p>
+            <p id="confirmMessage">¿Estás seguro?</p>
             <div class="modal-buttons">
                 <button class="btn danger" onclick="confirmDelete()">Sí, eliminar</button>
                 <button class="btn secondary" onclick="hideModal('confirmModal')">Cancelar</button>
             </div>
         </div>
     </div>
+
+    <!-- Botón de historial flotante -->
+    <button class="historial-flotante" onclick="showHistorial()">📋</button>
 
     <script src="app.js"></script>
 </body>
