@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mapa de Personajes - Gestor Literario</title>
+    <title>Constelación de Personajes - Gestor Literario</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Splash Screen -->
     <div class="splash-screen" id="splash">
         <div class="splash-content">
-            <div class="splash-icon">🕸️</div>
-            <div class="splash-title">Mapa de Personajes</div>
-            <div class="splash-subtitle">Visualiza tus relaciones</div>
+            <div class="splash-icon">✨</div>
+            <div class="splash-title">Constelación de Personajes</div>
+            <div class="splash-subtitle">Tus historias cobran vida</div>
         </div>
     </div>
 
     <!-- Contenedor principal -->
-    <div class="app-container" id="appContainer" style="display: none;">
+    <div class="app-container" id="appContainer">
         <div class="header">
             <h1>📖 Mis Obras Literarias</h1>
             <button class="btn-add" onclick="mostrarModalObra()">+ Nueva Obra</button>
@@ -38,19 +38,23 @@
         <div class="obra-content">
             <div class="tabs">
                 <div class="tab active" onclick="cambiarTab('personajes')">Personajes</div>
-                <div class="tab" onclick="cambiarTab('mapa')">Mapa de Relaciones</div>
+                <div class="tab" onclick="cambiarTab('constelacion')">Constelación</div>
             </div>
 
             <div id="tabPersonajes" class="tab-content">
                 <div class="personajes-grid" id="personajesGrid"></div>
             </div>
 
-            <div id="tabMapa" class="tab-content" style="display: none;">
-                <div class="controles-mapa">
-                    <button class="btn-add small" onclick="reorganizarMapa()">↺ Reorganizar</button>
-                    <span class="info-mapa">Arrastra los nodos para reubicarlos</span>
+            <div id="tabConstelacion" class="tab-content" style="display: none;">
+                <div class="constelacion-container" id="constelacionContainer">
+                    <canvas id="constelacionCanvas"></canvas>
+                    <div class="constelacion-leyenda">
+                        <div class="leyenda-item"><span class="color-familiar"></span> Familiar</div>
+                        <div class="leyenda-item"><span class="color-pareja"></span> Pareja</div>
+                        <div class="leyenda-item"><span class="color-amistad"></span> Amistad</div>
+                        <div class="leyenda-item"><span class="color-enemistad"></span> Enemistad</div>
+                    </div>
                 </div>
-                <div class="mapa-container" id="mapaContainer"></div>
             </div>
         </div>
     </div>
@@ -103,21 +107,21 @@
             <div class="form-group">
                 <label>Tipo de relación</label>
                 <select id="tipoRelacion">
-                    <option value="padre">👨 Padre de</option>
-                    <option value="madre">👩 Madre de</option>
-                    <option value="hermano">🤝 Hermano de</option>
-                    <option value="hermana">🤝 Hermana de</option>
-                    <option value="hijo">🧒 Hijo de</option>
-                    <option value="hija">👧 Hija de</option>
-                    <option value="esposo">💍 Esposo de</option>
-                    <option value="esposa">💍 Esposa de</option>
-                    <option value="novio">💕 Novio de</option>
-                    <option value="novia">💕 Novia de</option>
-                    <option value="amante">💔 Amante de</option>
-                    <option value="amigo">😊 Amigo de</option>
-                    <option value="amiga">😊 Amiga de</option>
-                    <option value="enemigo">⚔️ Enemigo de</option>
-                    <option value="enemiga">⚔️ Enemiga de</option>
+                    <option value="padre">👨 Padre</option>
+                    <option value="madre">👩 Madre</option>
+                    <option value="hermano">🤝 Hermano</option>
+                    <option value="hermana">🤝 Hermana</option>
+                    <option value="hijo">🧒 Hijo</option>
+                    <option value="hija">👧 Hija</option>
+                    <option value="esposo">💍 Esposo</option>
+                    <option value="esposa">💍 Esposa</option>
+                    <option value="novio">💕 Novio</option>
+                    <option value="novia">💕 Novia</option>
+                    <option value="amante">💔 Amante</option>
+                    <option value="amigo">😊 Amigo</option>
+                    <option value="amiga">😊 Amiga</option>
+                    <option value="enemigo">⚔️ Enemigo</option>
+                    <option value="enemiga">⚔️ Enemiga</option>
                 </select>
             </div>
             <div class="form-group">
