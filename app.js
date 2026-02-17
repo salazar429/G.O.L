@@ -4,18 +4,19 @@ let obraActual = null;
 let tabActual = 'personajes';
 let elementoAEliminar = null;
 
-// Variables para el mapa
-let nodos = [];
-let lineas = [];
-let arrastrando = null;
-let offsetX, offsetY;
+// Variables para la constelación
+let canvas, ctx;
+let personajes = [];
+let animacionFrame;
+let hoveredPersonaje = null;
+let selectedPersonaje = null;
+let mouseX = 0, mouseY = 0;
 
 // Splash screen
 setTimeout(() => {
     document.getElementById('splash').classList.add('hidden');
     setTimeout(() => {
         document.getElementById('splash').style.display = 'none';
-        document.getElementById('appContainer').style.display = 'block';
     }, 500);
 }, 2000);
 
@@ -48,6 +49,9 @@ function abrirObra(obraId) {
 function cerrarObraWindow() {
     document.getElementById('obraWindow').classList.remove('active');
     obraActual = null;
+    if (animacionFrame) {
+        cancelAnimationFrame(animacionFrame);
+    }
 }
 
 // Modales
@@ -237,10 +241,13 @@ function cambiarTab(tab) {
     });
     
     document.getElementById('tabPersonajes').style.display = tab === 'personajes' ? 'block' : 'none';
-    document.getElementById('tabMapa').style.display = tab === 'mapa' ? 'block' : 'none';
+    document.getElementById('tabConstelacion').style.display = tab === 'constelacion' ? 'block' : 'none';
     
-    if (tab === 'personajes') mostrarPersonajes();
-    if (tab === 'mapa') mostrarMapa();
+    if (tab === 'personajes') {
+        mostrarPersonajes();
+    } else if (tab === 'constelacion') {
+        iniciarConstelacion();
+    }
 }
 
 // Mostrar personajes
@@ -267,7 +274,212 @@ function mostrarPersonajes() {
     `}).join('');
 }
 
-// Función para obtener color según tipo de relación
+// Iniciar constelación
+function iniciarConstelacion() {
+    if (!obraActual?.personajes?.length) return;
+    
+    canvas = document.getElementById('constelacionCanvas');
+    ctx = canvas.getContext('2d');
+    
+    // Ajustar tamaño del canvas
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+    
+    // Inicializar posiciones de personajes
+    personajes = obraActual.personajes.map(p => ({
+        ...p,
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        radius: 40
+    }));
+    
+    // Eventos del mouse
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+        
+        // Detectar personaje bajo el mouse
+        hoveredPersonaje = null;
+        for (let i = personajes.length - 1; i >= 0; i--) {
+            const p = personajes[i];
+            const dx = mouseX - p.x;
+            const dy = mouseY - p.y;
+            const distancia = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distancia < p.radius) {
+                hoveredPersonaje = p;
+                break;
+            }
+        }
+    });
+    
+    canvas.addEventListener('click', () => {
+        if (hoveredPersonaje) {
+            selectedPersonaje = hoveredPersonaje === selectedPersonaje ? null : hoveredPersonaje;
+        }
+    });
+    
+    // Iniciar animación
+    animar();
+}
+
+// Animar constelación
+function animar() {
+    if (!ctx) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Dibujar estrellas de fondo
+    ctx.fillStyle = 'white';
+    for (let i = 0; i < 50; i++) {
+        const x = (i * 37) % canvas.width;
+        const y = (i * 73) % canvas.height;
+        ctx.beginPath();
+        ctx.arc(x, y, 1, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.sin(Date.now() * 0.001 + i) * 0.2})`;
+        ctx.fill();
+    }
+    
+    // Actualizar posiciones (movimiento suave)
+    personajes.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        
+        // Rebotar en bordes
+        if (p.x < p.radius || p.x > canvas.width - p.radius) {
+            p.vx *= -0.9;
+            p.x = Math.max(p.radius, Math.min(canvas.width - p.radius, p.x));
+        }
+        if (p.y < p.radius || p.y > canvas.height - p.radius) {
+            p.vy *= -0.9;
+            p.y = Math.max(p.radius, Math.min(canvas.height - p.radius, p.y));
+        }
+        
+        // Atracción suave hacia el centro
+        const centroX = canvas.width / 2;
+        const centroY = canvas.height / 2;
+        const dx = centroX - p.x;
+        const dy = centroY - p.y;
+        p.vx += dx * 0.0005;
+        p.vy += dy * 0.0005;
+        
+        // Limitar velocidad
+        const velocidad = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+        if (velocidad > 3) {
+            p.vx *= 0.95;
+            p.vy *= 0.95;
+        }
+    });
+    
+    // Dibujar líneas de relaciones
+    personajes.forEach(p => {
+        if (p.relaciones) {
+            p.relaciones.forEach(rel => {
+                const destino = personajes.find(d => d.id === rel.con);
+                if (destino) {
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(destino.x, destino.y);
+                    
+                    // Color según tipo de relación
+                    let color;
+                    if (['padre', 'madre', 'hijo', 'hija', 'hermano', 'hermana'].includes(rel.tipo)) {
+                        color = '#48bb78';
+                    } else if (['esposo', 'esposa', 'novio', 'novia', 'amante'].includes(rel.tipo)) {
+                        color = '#ed64a6';
+                    } else if (['amigo', 'amiga'].includes(rel.tipo)) {
+                        color = '#4299e1';
+                    } else if (['enemigo', 'enemiga'].includes(rel.tipo)) {
+                        color = '#f56565';
+                    } else {
+                        color = '#718096';
+                    }
+                    
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = selectedPersonaje === p || selectedPersonaje === destino ? 3 : 1.5;
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = selectedPersonaje === p || selectedPersonaje === destino ? 15 : 5;
+                    ctx.stroke();
+                }
+            });
+        }
+    });
+    
+    ctx.shadowBlur = 0;
+    
+    // Dibujar personajes
+    personajes.forEach(p => {
+        // Círculo exterior
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        
+        // Gradiente según género
+        const gradient = ctx.createRadialGradient(p.x - 5, p.y - 5, 5, p.x, p.y, p.radius);
+        if (p.genero === 'masculino') {
+            gradient.addColorStop(0, '#4299e1');
+            gradient.addColorStop(1, '#2b6cb0');
+        } else {
+            gradient.addColorStop(0, '#ed64a6');
+            gradient.addColorStop(1, '#d53f8c');
+        }
+        
+        ctx.fillStyle = gradient;
+        ctx.shadowColor = p.genero === 'masculino' ? '#4299e1' : '#ed64a6';
+        ctx.shadowBlur = hoveredPersonaje === p ? 25 : 15;
+        ctx.fill();
+        
+        // Borde si está seleccionado
+        if (selectedPersonaje === p) {
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 20;
+            ctx.shadowColor = 'white';
+            ctx.stroke();
+        }
+        
+        // Icono de persona
+        ctx.font = '24px Arial';
+        ctx.fillStyle = 'white';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('👤', p.x, p.y - 5);
+        
+        // Nombre
+        ctx.font = 'bold 12px Arial';
+        ctx.fillStyle = 'white';
+        ctx.shadowBlur = 5;
+        ctx.fillText(p.nombre.split(' ')[0], p.x, p.y + 20);
+        
+        // Edad
+        ctx.font = '10px Arial';
+        ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        ctx.fillText(p.edad + ' años', p.x, p.y + 35);
+    });
+    
+    // Tooltip
+    if (hoveredPersonaje && !selectedPersonaje) {
+        ctx.font = '14px Arial';
+        ctx.fillStyle = 'white';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = 'black';
+        ctx.fillText(hoveredPersonaje.nombre, mouseX, mouseY - 20);
+        
+        if (hoveredPersonaje.relaciones) {
+            ctx.font = '12px Arial';
+            ctx.fillStyle = '#A0AEC0';
+            ctx.fillText(hoveredPersonaje.relaciones.length + ' relaciones', mouseX, mouseY);
+        }
+    }
+    
+    animacionFrame = requestAnimationFrame(animar);
+}
+
+// Función para color de relación
 function getColorRelacion(tipo) {
     const familiares = ['padre', 'madre', 'hijo', 'hija', 'hermano', 'hermana'];
     const parejas = ['esposo', 'esposa', 'novio', 'novia', 'amante'];
@@ -281,198 +493,6 @@ function getColorRelacion(tipo) {
     return '#718096';
 }
 
-// Mostrar mapa de relaciones
-function mostrarMapa() {
-    const container = document.getElementById('mapaContainer');
-    if (!obraActual?.personajes?.length) {
-        container.innerHTML = '<div class="empty-message">No hay personajes para mostrar</div>';
-        return;
-    }
-    
-    container.innerHTML = '';
-    nodos = [];
-    lineas = [];
-    
-    const width = container.clientWidth || 800;
-    const height = 600;
-    
-    // Posiciones iniciales en círculo
-    const centroX = width / 2;
-    const centroY = height / 2;
-    const radio = Math.min(width, height) * 0.3;
-    
-    obraActual.personajes.forEach((personaje, index) => {
-        const angulo = (index / obraActual.personajes.length) * Math.PI * 2;
-        const x = centroX + radio * Math.cos(angulo);
-        const y = centroY + radio * Math.sin(angulo);
-        
-        const nodo = crearNodo(personaje, x, y);
-        container.appendChild(nodo);
-        nodos.push(nodo);
-    });
-    
-    // Crear líneas de relaciones
-    obraActual.personajes.forEach(personaje => {
-        if (personaje.relaciones) {
-            personaje.relaciones.forEach(rel => {
-                const origen = nodos.find(n => n.dataset.id === personaje.id);
-                const destino = nodos.find(n => n.dataset.id === rel.con);
-                
-                if (origen && destino) {
-                    const linea = crearLinea(origen, destino, rel.tipo);
-                    container.appendChild(linea);
-                    lineas.push(linea);
-                }
-            });
-        }
-    });
-}
-
-// Crear nodo de personaje
-function crearNodo(personaje, x, y) {
-    const div = document.createElement('div');
-    div.className = `nodo-personaje ${personaje.genero}`;
-    div.dataset.id = personaje.id;
-    div.style.left = (x - 50) + 'px';
-    div.style.top = (y - 40) + 'px';
-    
-    div.innerHTML = `
-        <div class="icono ${personaje.genero}">👤</div>
-        <div class="nombre">${personaje.nombre}</div>
-        <div class="edad">${personaje.edad || '?'} años</div>
-    `;
-    
-    // Hacer arrastrable
-    div.addEventListener('mousedown', iniciarArrastre);
-    
-    return div;
-}
-
-// Crear línea entre nodos
-function crearLinea(origen, destino, tipo) {
-    const linea = document.createElement('div');
-    linea.className = 'linea-relacion';
-    
-    const rect1 = origen.getBoundingClientRect();
-    const rect2 = destino.getBoundingClientRect();
-    const container = document.getElementById('mapaContainer').getBoundingClientRect();
-    
-    const x1 = rect1.left + rect1.width/2 - container.left;
-    const y1 = rect1.top + rect1.height/2 - container.top;
-    const x2 = rect2.left + rect2.width/2 - container.left;
-    const y2 = rect2.top + rect2.height/2 - container.top;
-    
-    const distancia = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-    const angulo = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
-    
-    linea.style.width = distancia + 'px';
-    linea.style.left = x1 + 'px';
-    linea.style.top = y1 + 'px';
-    linea.style.transform = `rotate(${angulo}deg)`;
-    linea.style.background = getColorRelacion(tipo);
-    linea.dataset.tipo = tipo;
-    
-    // Tooltip al hover
-    linea.addEventListener('mouseenter', (e) => {
-        const tooltip = document.createElement('div');
-        tooltip.className = 'tooltip';
-        tooltip.textContent = tipo;
-        tooltip.style.left = e.pageX + 'px';
-        tooltip.style.top = (e.pageY - 30) + 'px';
-        document.body.appendChild(tooltip);
-        
-        linea.addEventListener('mouseleave', () => {
-            document.querySelector('.tooltip')?.remove();
-        });
-    });
-    
-    return linea;
-}
-
-// Iniciar arrastre
-function iniciarArrastre(e) {
-    arrastrando = e.target.closest('.nodo-personaje');
-    if (!arrastrando) return;
-    
-    const rect = arrastrando.getBoundingClientRect();
-    offsetX = e.clientX - rect.left;
-    offsetY = e.clientY - rect.top;
-    
-    document.addEventListener('mousemove', arrastrar);
-    document.addEventListener('mouseup', detenerArrastre);
-}
-
-// Arrastrar nodo
-function arrastrar(e) {
-    if (!arrastrando) return;
-    
-    const container = document.getElementById('mapaContainer');
-    const containerRect = container.getBoundingClientRect();
-    
-    let x = e.clientX - containerRect.left - offsetX;
-    let y = e.clientY - containerRect.top - offsetY;
-    
-    // Limitar al contenedor
-    x = Math.max(0, Math.min(x, containerRect.width - arrastrando.offsetWidth));
-    y = Math.max(0, Math.min(y, containerRect.height - arrastrando.offsetHeight));
-    
-    arrastrando.style.left = x + 'px';
-    arrastrando.style.top = y + 'px';
-    
-    // Actualizar líneas
-    actualizarLineas();
-}
-
-// Detener arrastre
-function detenerArrastre() {
-    arrastrando = null;
-    document.removeEventListener('mousemove', arrastrar);
-    document.removeEventListener('mouseup', detenerArrastre);
-}
-
-// Actualizar líneas después de mover nodos
-function actualizarLineas() {
-    lineas.forEach(linea => linea.remove());
-    lineas = [];
-    
-    obraActual.personajes.forEach(personaje => {
-        if (personaje.relaciones) {
-            personaje.relaciones.forEach(rel => {
-                const origen = nodos.find(n => n.dataset.id === personaje.id);
-                const destino = nodos.find(n => n.dataset.id === rel.con);
-                
-                if (origen && destino) {
-                    const linea = crearLinea(origen, destino, rel.tipo);
-                    document.getElementById('mapaContainer').appendChild(linea);
-                    lineas.push(linea);
-                }
-            });
-        }
-    });
-}
-
-// Reorganizar mapa en círculo
-function reorganizarMapa() {
-    const container = document.getElementById('mapaContainer');
-    const width = container.clientWidth || 800;
-    const height = 600;
-    
-    const centroX = width / 2;
-    const centroY = height / 2;
-    const radio = Math.min(width, height) * 0.3;
-    
-    nodos.forEach((nodo, index) => {
-        const angulo = (index / nodos.length) * Math.PI * 2;
-        const x = centroX + radio * Math.cos(angulo) - nodo.offsetWidth/2;
-        const y = centroY + radio * Math.sin(angulo) - nodo.offsetHeight/2;
-        
-        nodo.style.left = x + 'px';
-        nodo.style.top = y + 'px';
-    });
-    
-    actualizarLineas();
-}
-
 // Inicializar
 mostrarObras();
 
@@ -483,9 +503,10 @@ window.onclick = function(event) {
     }
 };
 
-// Ajustar mapa al cambiar tamaño
+// Ajustar canvas al cambiar tamaño
 window.addEventListener('resize', () => {
-    if (tabActual === 'mapa' && obraActual?.personajes?.length) {
-        reorganizarMapa();
+    if (tabActual === 'constelacion' && canvas) {
+        canvas.width = canvas.clientWidth;
+        canvas.height = canvas.clientHeight;
     }
 });
