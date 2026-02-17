@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Árbol de Personajes - Gestor Literario</title>
+    <title>Mapa de Personajes - Gestor Literario</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Splash Screen -->
     <div class="splash-screen" id="splash">
         <div class="splash-content">
-            <div class="splash-icon">🌳</div>
-            <div class="splash-title">Árbol de Personajes</div>
-            <div class="splash-subtitle">Para escritores creativos</div>
+            <div class="splash-icon">🕸️</div>
+            <div class="splash-title">Mapa de Personajes</div>
+            <div class="splash-subtitle">Visualiza tus relaciones</div>
         </div>
     </div>
 
@@ -38,19 +38,19 @@
         <div class="obra-content">
             <div class="tabs">
                 <div class="tab active" onclick="cambiarTab('personajes')">Personajes</div>
-                <div class="tab" onclick="cambiarTab('arbol')">Árbol Familiar</div>
+                <div class="tab" onclick="cambiarTab('mapa')">Mapa de Relaciones</div>
             </div>
 
             <div id="tabPersonajes" class="tab-content">
                 <div class="personajes-grid" id="personajesGrid"></div>
             </div>
 
-            <div id="tabArbol" class="tab-content" style="display: none;">
-                <div class="leyenda">
-                    <div class="leyenda-item"><span style="background: #48bb78; width: 20px; height: 2px; display: inline-block;"></span> Padre/Madre</div>
-                    <div class="leyenda-item"><span style="background: #4299e1; width: 20px; height: 2px; display: inline-block;"></span> Hermano</div>
+            <div id="tabMapa" class="tab-content" style="display: none;">
+                <div class="controles-mapa">
+                    <button class="btn-add small" onclick="reorganizarMapa()">↺ Reorganizar</button>
+                    <span class="info-mapa">Arrastra los nodos para reubicarlos</span>
                 </div>
-                <div class="arbol-container" id="arbolGenealogico"></div>
+                <div class="mapa-container" id="mapaContainer"></div>
             </div>
         </div>
     </div>
@@ -97,33 +97,40 @@
     </div>
 
     <div class="modal" id="modalRelacion">
-    <div class="modal-content">
-        <h2>🔗 Nueva Relación</h2>
-        <input type="hidden" id="relacionOrigenId">
-        <div class="form-group">
-            <label>Tipo de relación</label>
-            <select id="tipoRelacion">
-                <option value="padre">👨 Padre de</option>
-                <option value="madre">👩 Madre de</option>
-                <option value="hermano">🤝 Hermano de</option>
-                <option value="hermana">🤝 Hermana de</option>
-                <option value="esposo">💍 Esposo de</option>
-                <option value="esposa">💍 Esposa de</option>
-                <option value="novio">💕 Novio de</option>
-                <option value="novia">💕 Novia de</option>
-                <option value="amante">💔 Amante de</option>
-            </select>
+        <div class="modal-content">
+            <h2>🔗 Nueva Relación</h2>
+            <input type="hidden" id="relacionOrigenId">
+            <div class="form-group">
+                <label>Tipo de relación</label>
+                <select id="tipoRelacion">
+                    <option value="padre">👨 Padre de</option>
+                    <option value="madre">👩 Madre de</option>
+                    <option value="hermano">🤝 Hermano de</option>
+                    <option value="hermana">🤝 Hermana de</option>
+                    <option value="hijo">🧒 Hijo de</option>
+                    <option value="hija">👧 Hija de</option>
+                    <option value="esposo">💍 Esposo de</option>
+                    <option value="esposa">💍 Esposa de</option>
+                    <option value="novio">💕 Novio de</option>
+                    <option value="novia">💕 Novia de</option>
+                    <option value="amante">💔 Amante de</option>
+                    <option value="amigo">😊 Amigo de</option>
+                    <option value="amiga">😊 Amiga de</option>
+                    <option value="enemigo">⚔️ Enemigo de</option>
+                    <option value="enemiga">⚔️ Enemiga de</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Con quién</label>
+                <select id="personajeDestino">
+                    <option value="">Seleccionar...</option>
+                </select>
+            </div>
+            <button class="btn-add" onclick="guardarRelacion()">Guardar Relación</button>
+            <button class="btn-back" onclick="cerrarModal('modalRelacion')">Cancelar</button>
         </div>
-        <div class="form-group">
-            <label>Con quién</label>
-            <select id="personajeDestino">
-                <option value="">Seleccionar...</option>
-            </select>
-        </div>
-        <button class="btn-add" onclick="guardarRelacion()">Guardar Relación</button>
-        <button class="btn-back" onclick="cerrarModal('modalRelacion')">Cancelar</button>
     </div>
-</div>
+
     <div class="modal" id="modalConfirmar">
         <div class="modal-content">
             <h2>⚠️ Confirmar</h2>
