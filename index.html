@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Árbol de Personajes - Gestor Literario</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <!-- Splash Screen (cargado desde splash.html) -->
-    <div id="splash-container"></div>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splash">
+        <div class="splash-content">
+            <div class="splash-icon">🌳</div>
+            <div class="splash-title">Árbol de Personajes</div>
+            <div class="splash-subtitle">Para escritores creativos</div>
+        </div>
+    </div>
 
     <!-- Contenedor principal -->
     <div class="app-container" id="appContainer" style="display: none;">
@@ -33,20 +38,18 @@
         <div class="obra-content">
             <div class="tabs">
                 <div class="tab active" onclick="cambiarTab('personajes')">Personajes</div>
-                <div class="tab" onclick="cambiarTab('relaciones')">Lista Relaciones</div>
-                <div class="tab" onclick="cambiarTab('arbol')">Árbol de Relaciones</div>
+                <div class="tab" onclick="cambiarTab('arbol')">Árbol Familiar</div>
             </div>
 
             <div id="tabPersonajes" class="tab-content">
                 <div class="personajes-grid" id="personajesGrid"></div>
             </div>
 
-            <div id="tabRelaciones" class="tab-content" style="display: none;">
-                <div id="relacionesList"></div>
-            </div>
-
             <div id="tabArbol" class="tab-content" style="display: none;">
-                <div class="leyenda" id="leyendaArbol"></div>
+                <div class="leyenda">
+                    <div class="leyenda-item"><span style="background: #48bb78; width: 20px; height: 2px; display: inline-block;"></span> Padre/Madre</div>
+                    <div class="leyenda-item"><span style="background: #4299e1; width: 20px; height: 2px; display: inline-block;"></span> Hermano</div>
+                </div>
                 <div class="arbol-container" id="arbolGenealogico"></div>
             </div>
         </div>
@@ -61,15 +64,11 @@
                 <input type="text" id="obraTitulo" placeholder="Ej: Mi Novela">
             </div>
             <div class="form-group">
-                <label>Género literario</label>
-                <input type="text" id="obraGenero" placeholder="Ej: Novela, Drama...">
-            </div>
-            <div class="form-group">
-                <label>Descripción</label>
-                <textarea id="obraDescripcion" placeholder="Breve descripción..."></textarea>
+                <label>Género</label>
+                <input type="text" id="obraGenero" placeholder="Ej: Novela">
             </div>
             <button class="btn-add" onclick="guardarObra()">Guardar Obra</button>
-            <button class="btn-back" onclick="cerrarModal('modalObra')" style="margin-top: 10px;">Cancelar</button>
+            <button class="btn-back" onclick="cerrarModal('modalObra')">Cancelar</button>
         </div>
     </div>
 
@@ -79,7 +78,7 @@
             <input type="hidden" id="personajeId">
             <div class="form-group">
                 <label>Nombre</label>
-                <input type="text" id="personajeNombre" placeholder="Nombre completo">
+                <input type="text" id="personajeNombre" placeholder="Nombre">
             </div>
             <div class="form-group">
                 <label>Género</label>
@@ -92,40 +91,41 @@
                 <label>Edad</label>
                 <input type="number" id="personajeEdad" placeholder="Edad">
             </div>
-            <div class="form-group">
-                <label>Descripción</label>
-                <textarea id="personajeDescripcion" placeholder="Describe al personaje..."></textarea>
-            </div>
             <button class="btn-add" onclick="guardarPersonaje()">Guardar</button>
-            <button class="btn-back" onclick="cerrarModal('modalPersonaje')" style="margin-top: 10px;">Cancelar</button>
+            <button class="btn-back" onclick="cerrarModal('modalPersonaje')">Cancelar</button>
         </div>
     </div>
 
     <div class="modal" id="modalRelacion">
         <div class="modal-content">
             <h2>🔗 Nueva Relación</h2>
-            <div id="relacionPaso1">
-                <h3 style="margin-bottom: 15px;">¿Con quién se relaciona?</h3>
-                <div class="personaje-selector" id="selectorPersonajes"></div>
+            <input type="hidden" id="relacionOrigenId">
+            <div class="form-group">
+                <label>Tipo de relación</label>
+                <select id="tipoRelacion">
+                    <option value="padre">👨 Padre de</option>
+                    <option value="madre">👩 Madre de</option>
+                    <option value="hermano">🤝 Hermano de</option>
+                    <option value="hermana">🤝 Hermana de</option>
+                </select>
             </div>
-            <div id="relacionPaso2" style="display: none;">
-                <h3 id="relacionTituloPaso2"></h3>
-                <div class="form-group">
-                    <label>Tipo de relación</label>
-                    <select id="tipoRelacion" size="5" style="height: auto;"></select>
-                </div>
-                <button class="btn-add" onclick="guardarRelacion()">Guardar Relación</button>
+            <div class="form-group">
+                <label>Con quién</label>
+                <select id="personajeDestino">
+                    <option value="">Seleccionar...</option>
+                </select>
             </div>
-            <button class="btn-back" onclick="cerrarModal('modalRelacion')" style="margin-top: 10px;">Cancelar</button>
+            <button class="btn-add" onclick="guardarRelacion()">Guardar Relación</button>
+            <button class="btn-back" onclick="cerrarModal('modalRelacion')">Cancelar</button>
         </div>
     </div>
 
     <div class="modal" id="modalConfirmar">
         <div class="modal-content">
             <h2>⚠️ Confirmar</h2>
-            <p id="confirmarMensaje" style="margin: 20px 0;">¿Estás seguro?</p>
+            <p id="confirmarMensaje">¿Estás seguro?</p>
             <button class="btn-add danger" onclick="ejecutarEliminar()">Sí, eliminar</button>
-            <button class="btn-back" onclick="cerrarModal('modalConfirmar')" style="margin-top: 10px;">Cancelar</button>
+            <button class="btn-back" onclick="cerrarModal('modalConfirmar')">Cancelar</button>
         </div>
     </div>
 
