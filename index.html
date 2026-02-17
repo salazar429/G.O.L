@@ -20,8 +20,8 @@
 
         <!-- Barra de búsqueda -->
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="🔍 Buscar obras o personajes..." oninput="filterContent()">
-            <select id="filterType" onchange="filterContent()">
+            <input type="text" id="searchInput" placeholder="🔍 Buscar obras o personajes...">
+            <select id="filterType">
                 <option value="all">Todos</option>
                 <option value="obras">Solo obras</option>
                 <option value="personajes">Solo personajes</option>
@@ -34,22 +34,24 @@
     <!-- Vista de obra -->
     <div class="container" id="obraContainer" style="display: none;">
         <div class="obra-view">
-            <div class="view-header">
+            <div class="view-header sticky-header">
                 <h2 id="obraTitle"></h2>
                 <div class="view-header-buttons">
                     <button class="btn back small" onclick="backToObras()">← Volver</button>
                     <button class="btn small" onclick="showTimeline()">📅 Línea de tiempo</button>
                     <button class="btn small" onclick="showGallery()">🖼️ Galería</button>
+                    <button class="btn small" onclick="exportPersonajes()">📤 Exportar Personajes</button>
                     <button class="btn small" onclick="showModal('personajeModal')">+ Personaje</button>
                 </div>
             </div>
 
             <!-- Pestañas -->
             <div class="tabs">
-                <div class="tab active" onclick="switchTab('lista')">Lista</div>
-                <div class="tab" onclick="switchTab('galeria')">Galería</div>
-                <div class="tab" onclick="switchTab('timeline')">Línea de tiempo</div>
-                <div class="tab" onclick="switchTab('comparativa')">Comparativa</div>
+                <div class="tab active" onclick="switchTab('lista')">📋 Lista</div>
+                <div class="tab" onclick="switchTab('galeria')">🖼️ Galería</div>
+                <div class="tab" onclick="switchTab('timeline')">📅 Línea de tiempo</div>
+                <div class="tab" onclick="switchTab('comparativa')">⚖️ Comparativa</div>
+                <div class="tab" onclick="switchTab('mascotas')">🐾 Mascotas</div>
             </div>
 
             <!-- Vista Lista -->
@@ -80,13 +82,18 @@
                 </div>
                 <div class="comparativa-container" id="comparisonContainer"></div>
             </div>
+
+            <!-- Vista Mascotas -->
+            <div id="mascotasView" class="tab-content">
+                <div class="mascotas-grid" id="mascotasGrid"></div>
+            </div>
         </div>
     </div>
 
     <!-- Modal Obra -->
     <div class="modal" id="obraModal">
         <div class="modal-content">
-            <h2>📕 ${obra ? 'Editar' : 'Nueva'} Obra</h2>
+            <h2>📕 Nueva Obra</h2>
             <input type="hidden" id="obraId">
             <div class="form-group">
                 <label>Título</label>
@@ -116,7 +123,7 @@
             <div class="form-row">
                 <div class="form-group" style="flex: 2;">
                     <label>Nombre</label>
-                    <input type="text" id="personajeNombre" placeholder="Nombre completo">
+                    <input type="text" id="personajeNombre" placeholder="Nombre">
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Apellido</label>
@@ -128,9 +135,9 @@
                 <div class="form-group" style="flex: 1;">
                     <label>Género</label>
                     <select id="personajeGenero">
-                        <option value="masculino">Masculino</option>
-                        <option value="femenino">Femenino</option>
-                        <option value="otro">Otro</option>
+                        <option value="masculino">👨 Masculino</option>
+                        <option value="femenino">👩 Femenino</option>
+                        <option value="otro">⚪ Otro</option>
                     </select>
                 </div>
                 <div class="form-group" style="flex: 1;">
@@ -140,10 +147,18 @@
                 <div class="form-group" style="flex: 1;">
                     <label>Estado</label>
                     <select id="personajeEstado">
-                        <option value="vivo">Vivo</option>
-                        <option value="muerto">Muerto</option>
+                        <option value="vivo">💚 Vivo</option>
+                        <option value="muerto">💀 Muerto</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label>Tipo</label>
+                <select id="personajeTipo" onchange="toggleTipoCampos()">
+                    <option value="persona">👤 Persona</option>
+                    <option value="mascota">🐾 Mascota</option>
+                </select>
             </div>
 
             <div class="form-group">
@@ -161,19 +176,37 @@
                 <textarea id="personajeNotas" placeholder="Notas importantes, citas famosas..." rows="3"></textarea>
             </div>
 
-            <div class="form-group">
-                <label>Año de nacimiento</label>
-                <input type="number" id="personajeNacimiento" placeholder="Ej: 1920">
+            <!-- Campos para personas -->
+            <div id="personaFields">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Año de nacimiento</label>
+                        <input type="number" id="personajeNacimiento" placeholder="Ej: 1920">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Año de muerte</label>
+                        <input type="number" id="personajeMuerte" placeholder="Ej: 2000">
+                    </div>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label>Año de muerte (si aplica)</label>
-                <input type="number" id="personajeMuerte" placeholder="Ej: 2000">
+            <!-- Campos para mascotas -->
+            <div id="mascotaFields" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Especie</label>
+                        <input type="text" id="mascotaEspecie" placeholder="Ej: Perro, Gato">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Raza</label>
+                        <input type="text" id="mascotaRaza" placeholder="Ej: Labrador, Siames">
+                    </div>
+                </div>
             </div>
 
             <div class="modal-buttons">
                 <button class="btn" onclick="savePersonaje()">Guardar</button>
-                <button class="btn secondary" onclick="hideModal('personajeModal')">Cancelar</button>
+                <button class="btn secondary" onclick="hideModal('personajeModal'); clearPersonajeForm()">Cancelar</button>
             </div>
         </div>
     </div>
@@ -185,23 +218,7 @@
             <input type="hidden" id="relacionOrigenId">
             <div class="form-group">
                 <label>Tipo de relación</label>
-                <select id="relacionTipo">
-                    <option value="padre">👨 Padre</option>
-                    <option value="madre">👩 Madre</option>
-                    <option value="hijo">🧒 Hijo</option>
-                    <option value="hija">👧 Hija</option>
-                    <option value="hermano">🤝 Hermano</option>
-                    <option value="hermana">🤝 Hermana</option>
-                    <option value="esposo">💍 Esposo</option>
-                    <option value="esposa">💍 Esposa</option>
-                    <option value="novio">💕 Novio</option>
-                    <option value="novia">💕 Novia</option>
-                    <option value="amante">💔 Amante</option>
-                    <option value="amigo">😊 Amigo</option>
-                    <option value="amiga">😊 Amiga</option>
-                    <option value="enemigo">⚔️ Enemigo</option>
-                    <option value="enemiga">⚔️ Enemiga</option>
-                </select>
+                <select id="relacionTipo" size="5" style="height: auto;"></select>
             </div>
             <div class="form-group">
                 <label>Con quién</label>
@@ -239,7 +256,7 @@
             <div id="personajeExpandidoContent"></div>
             <div class="modal-buttons">
                 <button class="btn secondary" onclick="hideModal('personajeExpandidoModal')">Cerrar</button>
-                <button class="btn" onclick="printPersonaje()">🖨️ Imprimir</button>
+                <button class="btn" onclick="printPersonaje()">🖨️ Imprimir ficha</button>
             </div>
         </div>
     </div>
@@ -259,7 +276,7 @@
     <div class="modal" id="confirmModal">
         <div class="modal-content">
             <h2>⚠️ Confirmar</h2>
-            <p id="confirmMessage">¿Estás seguro?</p>
+            <p id="confirmMessage" style="margin: 20px 0; color: #4a5568;">¿Estás seguro?</p>
             <div class="modal-buttons">
                 <button class="btn danger" onclick="confirmDelete()">Sí, eliminar</button>
                 <button class="btn secondary" onclick="hideModal('confirmModal')">Cancelar</button>
