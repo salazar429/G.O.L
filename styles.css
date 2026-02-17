@@ -6,9 +6,9 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    background: linear-gradient(135deg, #0B1120 0%, #1A2332 100%);
     min-height: 100vh;
-    color: #333;
+    color: #E2E8F0;
 }
 
 /* Splash Screen */
@@ -49,7 +49,7 @@ body {
     60% {transform: translateY(-15px);}
 }
 
-.hidden {
+.splash-screen.hidden {
     opacity: 0;
     pointer-events: none;
 }
@@ -62,13 +62,15 @@ body {
 }
 
 .header {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     border-radius: 15px;
     padding: 20px;
     margin-bottom: 20px;
     display: flex;
     flex-direction: column;
     gap: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (min-width: 768px) {
@@ -80,12 +82,13 @@ body {
 }
 
 .header h1 {
-    color: #667eea;
+    color: #fff;
     font-size: 24px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .btn-add {
-    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
     padding: 12px 24px;
@@ -93,8 +96,9 @@ body {
     cursor: pointer;
     font-size: 16px;
     font-weight: 600;
-    transition: background 0.3s;
+    transition: transform 0.3s, box-shadow 0.3s;
     width: 100%;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
 @media (min-width: 768px) {
@@ -104,7 +108,8 @@ body {
 }
 
 .btn-add:hover {
-    background: #764ba2;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
 }
 
 .btn-add.small {
@@ -113,11 +118,8 @@ body {
 }
 
 .btn-add.danger {
-    background: #f56565;
-}
-
-.btn-add.danger:hover {
-    background: #c53030;
+    background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+    box-shadow: 0 4px 15px rgba(245, 101, 101, 0.4);
 }
 
 /* Obras grid */
@@ -134,29 +136,44 @@ body {
 }
 
 .obra-card {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     border-radius: 15px;
     padding: 20px;
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: all 0.3s;
     position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #E2E8F0;
 }
 
 .obra-card:hover {
     transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(102, 126, 234, 0.5);
 }
 
 .delete-btn {
     position: absolute;
     top: 10px;
     right: 10px;
-    background: #f56565;
-    color: white;
-    border: none;
+    background: rgba(245, 101, 101, 0.2);
+    color: #f56565;
+    border: 1px solid rgba(245, 101, 101, 0.3);
     width: 30px;
     height: 30px;
     border-radius: 50%;
     cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.delete-btn:hover {
+    background: #f56565;
+    color: white;
 }
 
 /* Ventana de obra */
@@ -166,7 +183,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
+    background: linear-gradient(135deg, #0B1120 0%, #1A2332 100%);
     z-index: 9000;
     overflow-y: auto;
     display: none;
@@ -177,7 +194,8 @@ body {
 }
 
 .obra-header {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -185,6 +203,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 9001;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 @media (min-width: 768px) {
@@ -195,7 +214,7 @@ body {
 }
 
 .obra-header h2 {
-    color: #667eea;
+    color: white;
     font-size: 22px;
 }
 
@@ -205,13 +224,18 @@ body {
 }
 
 .btn-back {
-    background: #e2e8f0;
-    color: #4a5568;
-    border: none;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
     padding: 10px 20px;
     border-radius: 25px;
     cursor: pointer;
     font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-back:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .obra-content {
@@ -223,9 +247,11 @@ body {
     display: flex;
     gap: 5px;
     margin-bottom: 20px;
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     padding: 10px;
     border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .tab {
@@ -233,10 +259,12 @@ body {
     cursor: pointer;
     border-radius: 25px;
     font-weight: 600;
+    color: #A0AEC0;
+    transition: all 0.3s;
 }
 
 .tab.active {
-    background: #667eea;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
 }
 
@@ -254,19 +282,21 @@ body {
 }
 
 .personaje-card {
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
     border-radius: 15px;
     padding: 20px;
-    border-left: 8px solid;
     position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #E2E8F0;
 }
 
 .personaje-card.masculino {
-    border-left-color: #4299e1;
+    border-left: 5px solid #4299e1;
 }
 
 .personaje-card.femenino {
-    border-left-color: #ed64a6;
+    border-left: 5px solid #ed64a6;
 }
 
 .personaje-actions {
@@ -276,15 +306,23 @@ body {
 }
 
 .btn-icon {
-    background: none;
+    background: rgba(255, 255, 255, 0.1);
     border: none;
     font-size: 18px;
     cursor: pointer;
     padding: 5px;
+    border-radius: 5px;
+    color: #A0AEC0;
+    transition: all 0.3s;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
 }
 
 .btn-relacion {
-    background: #48bb78;
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -292,17 +330,30 @@ body {
     cursor: pointer;
     margin-top: 10px;
     width: 100%;
+    font-weight: 600;
+    transition: transform 0.3s;
+}
+
+.btn-relacion:hover {
+    transform: translateY(-2px);
 }
 
 .btn-delete-personaje {
-    background: #f56565;
-    color: white;
-    border: none;
+    background: rgba(245, 101, 101, 0.2);
+    color: #f56565;
+    border: 1px solid rgba(245, 101, 101, 0.3);
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
     margin-top: 10px;
     width: 100%;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.btn-delete-personaje:hover {
+    background: #f56565;
+    color: white;
 }
 
 /* Modal */
@@ -314,6 +365,7 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
     z-index: 20000;
     justify-content: center;
     align-items: center;
@@ -324,17 +376,19 @@ body {
 }
 
 .modal-content {
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 25px;
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
     overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
 }
 
 .modal-content h2 {
-    color: #667eea;
+    color: #1A2332;
     margin-bottom: 20px;
 }
 
@@ -346,109 +400,98 @@ body {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
+    color: #2D3748;
 }
 
 .form-group input,
 .form-group select {
     width: 100%;
     padding: 12px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #E2E8F0;
     border-radius: 10px;
+    font-size: 16px;
+    transition: border-color 0.3s;
 }
 
-/* Mapa de relaciones */
-.mapa-container {
-    background: #2d3748;
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Constelación */
+.constelacion-container {
+    background: rgba(0, 0, 0, 0.3);
     border-radius: 15px;
-    min-height: 600px;
+    padding: 20px;
     position: relative;
-    overflow: hidden;
-    border: 2px solid #4a5568;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.controles-mapa {
+#constelacionCanvas {
+    width: 100%;
+    height: 600px;
+    display: block;
+    background: radial-gradient(circle at center, #1A2332 0%, #0B1120 100%);
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.constelacion-leyenda {
     display: flex;
-    gap: 15px;
-    align-items: center;
-    margin-bottom: 15px;
-    background: white;
-    padding: 10px 20px;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 15px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 30px;
+    flex-wrap: wrap;
 }
 
-.info-mapa {
-    color: #718096;
+.leyenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #A0AEC0;
     font-size: 14px;
 }
 
-.linea-relacion {
-    position: absolute;
-    height: 2px;
-    transform-origin: 0 0;
-    pointer-events: none;
-    z-index: 1;
+.color-familiar {
+    width: 20px;
+    height: 4px;
+    background: #48bb78;
+    border-radius: 2px;
+    box-shadow: 0 0 10px #48bb78;
 }
 
-.nodo-personaje {
-    position: absolute;
-    width: 100px;
-    background: white;
-    border-radius: 15px;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 5px;
-    cursor: move;
-    user-select: none;
-    z-index: 2;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-    transition: box-shadow 0.3s;
+.color-pareja {
+    width: 20px;
+    height: 4px;
+    background: #ed64a6;
+    border-radius: 2px;
+    box-shadow: 0 0 10px #ed64a6;
 }
 
-.nodo-personaje:active {
-    cursor: grabbing;
-    box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+.color-amistad {
+    width: 20px;
+    height: 4px;
+    background: #4299e1;
+    border-radius: 2px;
+    box-shadow: 0 0 10px #4299e1;
 }
 
-.nodo-personaje.masculino {
-    border-top: 5px solid #4299e1;
-}
-
-.nodo-personaje.femenino {
-    border-top: 5px solid #ed64a6;
-}
-
-.nodo-personaje .icono {
-    font-size: 30px;
-}
-
-.nodo-personaje .nombre {
-    font-weight: bold;
-    font-size: 12px;
-    text-align: center;
-}
-
-.nodo-personaje .edad {
-    font-size: 10px;
-    color: #666;
-}
-
-/* Tooltip */
-.tooltip {
-    position: absolute;
-    background: rgba(0,0,0,0.8);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    pointer-events: none;
-    z-index: 3;
+.color-enemistad {
+    width: 20px;
+    height: 4px;
+    background: #f56565;
+    border-radius: 2px;
+    box-shadow: 0 0 10px #f56565;
 }
 
 .empty-message {
     text-align: center;
     padding: 40px;
-    background: white;
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 15px;
+    color: #A0AEC0;
 }
