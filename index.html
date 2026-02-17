@@ -3,86 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Constelación de Personajes - Gestor Literario</title>
+    <title>Gestor de Personajes</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Splash Screen -->
-    <div class="splash-screen" id="splash">
+    <div class="splash" id="splash">
         <div class="splash-content">
-            <div class="splash-icon">✨</div>
-            <div class="splash-title">Constelación de Personajes</div>
-            <div class="splash-subtitle">Tus historias cobran vida</div>
+            <div class="splash-icon">📚✨</div>
+            <div class="splash-title">Gestor de Personajes</div>
+            <div class="splash-subtitle">Para escritores creativos</div>
         </div>
     </div>
 
     <!-- Contenedor principal -->
-    <div class="app-container" id="appContainer">
+    <div class="container" id="mainContainer" style="display: none;">
         <div class="header">
             <h1>📖 Mis Obras Literarias</h1>
-            <button class="btn-add" onclick="mostrarModalObra()">+ Nueva Obra</button>
+            <button class="btn" onclick="showModal('obraModal')">+ Nueva Obra</button>
         </div>
         <div class="obras-grid" id="obrasGrid"></div>
     </div>
 
-    <!-- Ventana de obra -->
-    <div class="obra-window" id="obraWindow">
-        <div class="obra-header">
-            <h2 id="obraTituloWindow"></h2>
-            <div class="obra-header-buttons">
-                <button class="btn-back" onclick="cerrarObraWindow()">← Volver</button>
-                <button class="btn-add" onclick="mostrarModalPersonaje()">+ Personaje</button>
-            </div>
-        </div>
-        
-        <div class="obra-content">
-            <div class="tabs">
-                <div class="tab active" onclick="cambiarTab('personajes')">Personajes</div>
-                <div class="tab" onclick="cambiarTab('constelacion')">Constelación</div>
-            </div>
-
-            <div id="tabPersonajes" class="tab-content">
-                <div class="personajes-grid" id="personajesGrid"></div>
-            </div>
-
-            <div id="tabConstelacion" class="tab-content" style="display: none;">
-                <div class="constelacion-container" id="constelacionContainer">
-                    <canvas id="constelacionCanvas"></canvas>
-                    <div class="constelacion-leyenda">
-                        <div class="leyenda-item"><span class="color-familiar"></span> Familiar</div>
-                        <div class="leyenda-item"><span class="color-pareja"></span> Pareja</div>
-                        <div class="leyenda-item"><span class="color-amistad"></span> Amistad</div>
-                        <div class="leyenda-item"><span class="color-enemistad"></span> Enemistad</div>
-                    </div>
+    <!-- Vista de obra -->
+    <div class="container" id="obraContainer" style="display: none;">
+        <div class="obra-view">
+            <div class="view-header">
+                <h2 id="obraTitle"></h2>
+                <div class="view-header-buttons">
+                    <button class="btn back small" onclick="backToObras()">← Volver</button>
+                    <button class="btn small" onclick="showModal('personajeModal')">+ Personaje</button>
                 </div>
+            </div>
+
+            <div id="personajesContainer">
+                <div class="personajes-grid" id="personajesGrid"></div>
             </div>
         </div>
     </div>
 
-    <!-- Modales -->
-    <div class="modal" id="modalObra">
+    <!-- Modal Obra -->
+    <div class="modal" id="obraModal">
         <div class="modal-content">
             <h2>📕 Nueva Obra</h2>
             <div class="form-group">
-                <label>Título</label>
-                <input type="text" id="obraTitulo" placeholder="Ej: Mi Novela">
+                <label>Título de la obra</label>
+                <input type="text" id="obraTitulo" placeholder="Ej: Cien años de soledad">
             </div>
             <div class="form-group">
-                <label>Género</label>
-                <input type="text" id="obraGenero" placeholder="Ej: Novela">
+                <label>Género literario</label>
+                <input type="text" id="obraGenero" placeholder="Ej: Novela, Drama, Fantasía">
             </div>
-            <button class="btn-add" onclick="guardarObra()">Guardar Obra</button>
-            <button class="btn-back" onclick="cerrarModal('modalObra')">Cancelar</button>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="obraDescripcion" placeholder="Breve descripción de la obra..." rows="3"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="saveObra()">Guardar</button>
+                <button class="btn secondary" onclick="hideModal('obraModal')">Cancelar</button>
+            </div>
         </div>
     </div>
 
-    <div class="modal" id="modalPersonaje">
+    <!-- Modal Personaje -->
+    <div class="modal" id="personajeModal">
         <div class="modal-content">
-            <h2 id="modalPersonajeTitulo">👤 Nuevo Personaje</h2>
+            <h2 id="personajeModalTitle">👤 Nuevo Personaje</h2>
             <input type="hidden" id="personajeId">
             <div class="form-group">
                 <label>Nombre</label>
-                <input type="text" id="personajeNombre" placeholder="Nombre">
+                <input type="text" id="personajeNombre" placeholder="Ej: Remedios la bella">
             </div>
             <div class="form-group">
                 <label>Género</label>
@@ -93,26 +83,33 @@
             </div>
             <div class="form-group">
                 <label>Edad</label>
-                <input type="number" id="personajeEdad" placeholder="Edad">
+                <input type="number" id="personajeEdad" placeholder="Ej: 25">
             </div>
-            <button class="btn-add" onclick="guardarPersonaje()">Guardar</button>
-            <button class="btn-back" onclick="cerrarModal('modalPersonaje')">Cancelar</button>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="personajeDescripcion" placeholder="Describe al personaje..." rows="3"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn" onclick="savePersonaje()">Guardar</button>
+                <button class="btn secondary" onclick="hideModal('personajeModal')">Cancelar</button>
+            </div>
         </div>
     </div>
 
-    <div class="modal" id="modalRelacion">
+    <!-- Modal Relación -->
+    <div class="modal" id="relacionModal">
         <div class="modal-content">
             <h2>🔗 Nueva Relación</h2>
             <input type="hidden" id="relacionOrigenId">
             <div class="form-group">
                 <label>Tipo de relación</label>
-                <select id="tipoRelacion">
+                <select id="relacionTipo">
                     <option value="padre">👨 Padre</option>
                     <option value="madre">👩 Madre</option>
-                    <option value="hermano">🤝 Hermano</option>
-                    <option value="hermana">🤝 Hermana</option>
                     <option value="hijo">🧒 Hijo</option>
                     <option value="hija">👧 Hija</option>
+                    <option value="hermano">🤝 Hermano</option>
+                    <option value="hermana">🤝 Hermana</option>
                     <option value="esposo">💍 Esposo</option>
                     <option value="esposa">💍 Esposa</option>
                     <option value="novio">💕 Novio</option>
@@ -126,21 +123,24 @@
             </div>
             <div class="form-group">
                 <label>Con quién</label>
-                <select id="personajeDestino">
-                    <option value="">Seleccionar...</option>
-                </select>
+                <select id="relacionDestino"></select>
             </div>
-            <button class="btn-add" onclick="guardarRelacion()">Guardar Relación</button>
-            <button class="btn-back" onclick="cerrarModal('modalRelacion')">Cancelar</button>
+            <div class="modal-buttons">
+                <button class="btn" onclick="saveRelacion()">Guardar</button>
+                <button class="btn secondary" onclick="hideModal('relacionModal')">Cancelar</button>
+            </div>
         </div>
     </div>
 
-    <div class="modal" id="modalConfirmar">
+    <!-- Modal Confirmar -->
+    <div class="modal" id="confirmModal">
         <div class="modal-content">
             <h2>⚠️ Confirmar</h2>
-            <p id="confirmarMensaje">¿Estás seguro?</p>
-            <button class="btn-add danger" onclick="ejecutarEliminar()">Sí, eliminar</button>
-            <button class="btn-back" onclick="cerrarModal('modalConfirmar')">Cancelar</button>
+            <p id="confirmMessage" style="margin: 20px 0; color: #4a5568;">¿Estás seguro?</p>
+            <div class="modal-buttons">
+                <button class="btn danger" onclick="confirmDelete()">Sí, eliminar</button>
+                <button class="btn secondary" onclick="hideModal('confirmModal')">Cancelar</button>
+            </div>
         </div>
     </div>
 
