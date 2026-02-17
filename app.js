@@ -11,6 +11,7 @@ let animacionFrame;
 let hoveredPersonaje = null;
 let selectedPersonaje = null;
 let mouseX = 0, mouseY = 0;
+let constelacionIniciada = false;
 
 // Splash screen
 setTimeout(() => {
@@ -44,6 +45,7 @@ function abrirObra(obraId) {
     document.getElementById('obraTituloWindow').textContent = `📖 ${obraActual.titulo}`;
     document.getElementById('obraWindow').classList.add('active');
     mostrarPersonajes();
+    constelacionIniciada = false; // Resetear cuando se abre nueva obra
 }
 
 function cerrarObraWindow() {
@@ -51,7 +53,9 @@ function cerrarObraWindow() {
     obraActual = null;
     if (animacionFrame) {
         cancelAnimationFrame(animacionFrame);
+        animacionFrame = null;
     }
+    constelacionIniciada = false;
 }
 
 // Modales
@@ -159,6 +163,9 @@ function guardarPersonaje() {
     
     cerrarModal('modalPersonaje');
     mostrarPersonajes();
+    if (tabActual === 'constelacion') {
+        iniciarConstelacion();
+    }
 }
 
 // Guardar relación
@@ -178,17 +185,24 @@ function guardarRelacion() {
         origen.relaciones = [];
     }
     
-    origen.relaciones.push({
-        con: destinoId,
-        tipo: tipo
-    });
-    
-    const index = obras.findIndex(o => o.id === obraActual.id);
-    obras[index] = obraActual;
-    localStorage.setItem('obras', JSON.stringify(obras));
+    // Verificar si ya existe la relación
+    const existe = origen.relaciones.some(r => r.con === destinoId);
+    if (!existe) {
+        origen.relaciones.push({
+            con: destinoId,
+            tipo: tipo
+        });
+        
+        const index = obras.findIndex(o => o.id === obraActual.id);
+        obras[index] = obraActual;
+        localStorage.setItem('obras', JSON.stringify(obras));
+    }
     
     cerrarModal('modalRelacion');
     mostrarPersonajes();
+    if (tabActual === 'constelacion') {
+        iniciarConstelacion();
+    }
 }
 
 // Eliminar
@@ -226,6 +240,9 @@ function ejecutarEliminar() {
         localStorage.setItem('obras', JSON.stringify(obras));
         
         mostrarPersonajes();
+        if (tabActual === 'constelacion') {
+            iniciarConstelacion();
+        }
     }
     
     cerrarModal('modalConfirmar');
@@ -246,7 +263,10 @@ function cambiarTab(tab) {
     if (tab === 'personajes') {
         mostrarPersonajes();
     } else if (tab === 'constelacion') {
-        iniciarConstelacion();
+        // Pequeño retraso para asegurar que el DOM está listo
+        setTimeout(() => {
+            iniciarConstelacion();
+        }, 100);
     }
 }
 
@@ -276,59 +296,100 @@ function mostrarPersonajes() {
 
 // Iniciar constelación
 function iniciarConstelacion() {
-    if (!obraActual?.personajes?.length) return;
+    console.log('Iniciando constelación...');
     
+    if (!obraActual) {
+        console.log('No hay obra actual');
+        return;
+    }
+    
+    if (!obraActual.personajes || obraActual.personajes.length === 0) {
+        console.log('No hay personajes');
+        const container = document.getElementById('constelacionContainer');
+        if (container) {
+            container.innerHTML = '<div class="empty-message">👤 No hay personajes para mostrar</div>';
+        }
+        return;
+    }
+    
+    // Obtener canvas
     canvas = document.getElementById('constelacionCanvas');
-    ctx = canvas.getContext('2d');
+    if (!canvas) {
+        console.log('Canvas no encontrado');
+        return;
+    }
+    
+    console.log('Canvas encontrado, dimensiones:', canvas.clientWidth, canvas.clientHeight);
     
     // Ajustar tamaño del canvas
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
+    canvas.width = canvas.clientWidth || 800;
+    canvas.height = canvas.clientHeight || 600;
     
-    // Inicializar posiciones de personajes
-    personajes = obraActual.personajes.map(p => ({
-        ...p,
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2,
-        radius: 40
-    }));
+    ctx = canvas.getContext('2d');
+    
+    // Inicializar posiciones de personajes si es necesario
+    if (!constelacionIniciada || personajes.length === 0) {
+        console.log('Inicializando posiciones de personajes');
+        personajes = obraActual.personajes.map(p => ({
+            ...p,
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            radius: 40
+        }));
+        constelacionIniciada = true;
+    }
     
     // Eventos del mouse
-    canvas.addEventListener('mousemove', (e) => {
-        const rect = canvas.getBoundingClientRect();
-        mouseX = e.clientX - rect.left;
-        mouseY = e.clientY - rect.top;
-        
-        // Detectar personaje bajo el mouse
+    canvas.addEventListener('mousemove', manejarMouseMove);
+    canvas.addEventListener('click', manejarClick);
+    canvas.addEventListener('mouseleave', () => {
         hoveredPersonaje = null;
-        for (let i = personajes.length - 1; i >= 0; i--) {
-            const p = personajes[i];
-            const dx = mouseX - p.x;
-            const dy = mouseY - p.y;
-            const distancia = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distancia < p.radius) {
-                hoveredPersonaje = p;
-                break;
-            }
-        }
-    });
-    
-    canvas.addEventListener('click', () => {
-        if (hoveredPersonaje) {
-            selectedPersonaje = hoveredPersonaje === selectedPersonaje ? null : hoveredPersonaje;
-        }
     });
     
     // Iniciar animación
+    if (animacionFrame) {
+        cancelAnimationFrame(animacionFrame);
+    }
     animar();
+}
+
+function manejarMouseMove(e) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    mouseX = (e.clientX - rect.left) * scaleX;
+    mouseY = (e.clientY - rect.top) * scaleY;
+    
+    // Detectar personaje bajo el mouse
+    hoveredPersonaje = null;
+    for (let i = personajes.length - 1; i >= 0; i--) {
+        const p = personajes[i];
+        const dx = mouseX - p.x;
+        const dy = mouseY - p.y;
+        const distancia = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distancia < p.radius) {
+            hoveredPersonaje = p;
+            break;
+        }
+    }
+}
+
+function manejarClick() {
+    if (hoveredPersonaje) {
+        selectedPersonaje = hoveredPersonaje === selectedPersonaje ? null : hoveredPersonaje;
+    }
 }
 
 // Animar constelación
 function animar() {
-    if (!ctx) return;
+    if (!ctx || !canvas) {
+        console.log('Contexto o canvas no disponible');
+        return;
+    }
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
@@ -343,8 +404,45 @@ function animar() {
         ctx.fill();
     }
     
-    // Actualizar posiciones (movimiento suave)
+    // Dibujar líneas de relaciones
     personajes.forEach(p => {
+        if (p.relaciones && p.relaciones.length > 0) {
+            p.relaciones.forEach(rel => {
+                const destino = personajes.find(d => d.id === rel.con);
+                if (destino) {
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(destino.x, destino.y);
+                    
+                    // Color según tipo de relación
+                    let color;
+                    if (['padre', 'madre', 'hijo', 'hija', 'hermano', 'hermana'].includes(rel.tipo)) {
+                        color = '#48bb78';
+                    } else if (['esposo', 'esposa', 'novio', 'novia', 'amante'].includes(rel.tipo)) {
+                        color = '#ed64a6';
+                    } else if (['amigo', 'amiga'].includes(rel.tipo)) {
+                        color = '#4299e1';
+                    } else if (['enemigo', 'enemiga'].includes(rel.tipo)) {
+                        color = '#f56565';
+                    } else {
+                        color = '#718096';
+                    }
+                    
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = (selectedPersonaje === p || selectedPersonaje === destino) ? 3 : 1.5;
+                    ctx.shadowColor = color;
+                    ctx.shadowBlur = (selectedPersonaje === p || selectedPersonaje === destino) ? 15 : 5;
+                    ctx.stroke();
+                }
+            });
+        }
+    });
+    
+    ctx.shadowBlur = 0;
+    
+    // Dibujar personajes
+    personajes.forEach(p => {
+        // Actualizar posiciones
         p.x += p.vx;
         p.y += p.vy;
         
@@ -368,50 +466,11 @@ function animar() {
         
         // Limitar velocidad
         const velocidad = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
-        if (velocidad > 3) {
-            p.vx *= 0.95;
-            p.vy *= 0.95;
+        if (velocidad > 2) {
+            p.vx *= 0.98;
+            p.vy *= 0.98;
         }
-    });
-    
-    // Dibujar líneas de relaciones
-    personajes.forEach(p => {
-        if (p.relaciones) {
-            p.relaciones.forEach(rel => {
-                const destino = personajes.find(d => d.id === rel.con);
-                if (destino) {
-                    ctx.beginPath();
-                    ctx.moveTo(p.x, p.y);
-                    ctx.lineTo(destino.x, destino.y);
-                    
-                    // Color según tipo de relación
-                    let color;
-                    if (['padre', 'madre', 'hijo', 'hija', 'hermano', 'hermana'].includes(rel.tipo)) {
-                        color = '#48bb78';
-                    } else if (['esposo', 'esposa', 'novio', 'novia', 'amante'].includes(rel.tipo)) {
-                        color = '#ed64a6';
-                    } else if (['amigo', 'amiga'].includes(rel.tipo)) {
-                        color = '#4299e1';
-                    } else if (['enemigo', 'enemiga'].includes(rel.tipo)) {
-                        color = '#f56565';
-                    } else {
-                        color = '#718096';
-                    }
-                    
-                    ctx.strokeStyle = color;
-                    ctx.lineWidth = selectedPersonaje === p || selectedPersonaje === destino ? 3 : 1.5;
-                    ctx.shadowColor = color;
-                    ctx.shadowBlur = selectedPersonaje === p || selectedPersonaje === destino ? 15 : 5;
-                    ctx.stroke();
-                }
-            });
-        }
-    });
-    
-    ctx.shadowBlur = 0;
-    
-    // Dibujar personajes
-    personajes.forEach(p => {
+        
         // Círculo exterior
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
@@ -462,14 +521,14 @@ function animar() {
     });
     
     // Tooltip
-    if (hoveredPersonaje && !selectedPersonaje) {
+    if (hoveredPersonaje && hoveredPersonaje !== selectedPersonaje) {
         ctx.font = '14px Arial';
         ctx.fillStyle = 'white';
         ctx.shadowBlur = 10;
         ctx.shadowColor = 'black';
         ctx.fillText(hoveredPersonaje.nombre, mouseX, mouseY - 20);
         
-        if (hoveredPersonaje.relaciones) {
+        if (hoveredPersonaje.relaciones && hoveredPersonaje.relaciones.length > 0) {
             ctx.font = '12px Arial';
             ctx.fillStyle = '#A0AEC0';
             ctx.fillText(hoveredPersonaje.relaciones.length + ' relaciones', mouseX, mouseY);
