@@ -2,67 +2,133 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Splash Screen</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-
-        .splash-content {
-            text-align: center;
-            color: white;
-            animation: fadeInUp 1s ease;
-        }
-
-        .splash-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: bounce 2s infinite;
-        }
-
-        .splash-title {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .splash-subtitle {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-30px);}
-            60% {transform: translateY(-15px);}
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Árbol de Personajes - Gestor Literario</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <div class="splash-content">
-        <div class="splash-icon">🌳</div>
-        <div class="splash-title">Árbol de Personajes</div>
-        <div class="splash-subtitle">Para escritores creativos</div>
+    <!-- Splash Screen (cargado desde splash.html) -->
+    <div id="splash-container"></div>
+
+    <!-- Contenedor principal -->
+    <div class="app-container" id="appContainer" style="display: none;">
+        <div class="header">
+            <h1>📖 Mis Obras Literarias</h1>
+            <button class="btn-add" onclick="mostrarModalObra()">+ Nueva Obra</button>
+        </div>
+        <div class="obras-grid" id="obrasGrid"></div>
     </div>
 
-    <script>
-        // Redirigir al index después de 2 segundos
-        setTimeout(() => {
-            window.location.href = 'index.html';
-        }, 2000);
-    </script>
+    <!-- Ventana de obra -->
+    <div class="obra-window" id="obraWindow">
+        <div class="obra-header">
+            <h2 id="obraTituloWindow"></h2>
+            <div class="obra-header-buttons">
+                <button class="btn-back" onclick="cerrarObraWindow()">← Volver</button>
+                <button class="btn-add" onclick="mostrarModalPersonaje()">+ Personaje</button>
+            </div>
+        </div>
+        
+        <div class="obra-content">
+            <div class="tabs">
+                <div class="tab active" onclick="cambiarTab('personajes')">Personajes</div>
+                <div class="tab" onclick="cambiarTab('relaciones')">Lista Relaciones</div>
+                <div class="tab" onclick="cambiarTab('arbol')">Árbol de Relaciones</div>
+            </div>
+
+            <div id="tabPersonajes" class="tab-content">
+                <div class="personajes-grid" id="personajesGrid"></div>
+            </div>
+
+            <div id="tabRelaciones" class="tab-content" style="display: none;">
+                <div id="relacionesList"></div>
+            </div>
+
+            <div id="tabArbol" class="tab-content" style="display: none;">
+                <div class="leyenda" id="leyendaArbol"></div>
+                <div class="arbol-container" id="arbolGenealogico"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales -->
+    <div class="modal" id="modalObra">
+        <div class="modal-content">
+            <h2>📕 Nueva Obra</h2>
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" id="obraTitulo" placeholder="Ej: Mi Novela">
+            </div>
+            <div class="form-group">
+                <label>Género literario</label>
+                <input type="text" id="obraGenero" placeholder="Ej: Novela, Drama...">
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="obraDescripcion" placeholder="Breve descripción..."></textarea>
+            </div>
+            <button class="btn-add" onclick="guardarObra()">Guardar Obra</button>
+            <button class="btn-back" onclick="cerrarModal('modalObra')" style="margin-top: 10px;">Cancelar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modalPersonaje">
+        <div class="modal-content">
+            <h2 id="modalPersonajeTitulo">👤 Nuevo Personaje</h2>
+            <input type="hidden" id="personajeId">
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" id="personajeNombre" placeholder="Nombre completo">
+            </div>
+            <div class="form-group">
+                <label>Género</label>
+                <select id="personajeGenero">
+                    <option value="masculino">Masculino</option>
+                    <option value="femenino">Femenino</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Edad</label>
+                <input type="number" id="personajeEdad" placeholder="Edad">
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="personajeDescripcion" placeholder="Describe al personaje..."></textarea>
+            </div>
+            <button class="btn-add" onclick="guardarPersonaje()">Guardar</button>
+            <button class="btn-back" onclick="cerrarModal('modalPersonaje')" style="margin-top: 10px;">Cancelar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modalRelacion">
+        <div class="modal-content">
+            <h2>🔗 Nueva Relación</h2>
+            <div id="relacionPaso1">
+                <h3 style="margin-bottom: 15px;">¿Con quién se relaciona?</h3>
+                <div class="personaje-selector" id="selectorPersonajes"></div>
+            </div>
+            <div id="relacionPaso2" style="display: none;">
+                <h3 id="relacionTituloPaso2"></h3>
+                <div class="form-group">
+                    <label>Tipo de relación</label>
+                    <select id="tipoRelacion" size="5" style="height: auto;"></select>
+                </div>
+                <button class="btn-add" onclick="guardarRelacion()">Guardar Relación</button>
+            </div>
+            <button class="btn-back" onclick="cerrarModal('modalRelacion')" style="margin-top: 10px;">Cancelar</button>
+        </div>
+    </div>
+
+    <div class="modal" id="modalConfirmar">
+        <div class="modal-content">
+            <h2>⚠️ Confirmar</h2>
+            <p id="confirmarMensaje" style="margin: 20px 0;">¿Estás seguro?</p>
+            <button class="btn-add danger" onclick="ejecutarEliminar()">Sí, eliminar</button>
+            <button class="btn-back" onclick="cerrarModal('modalConfirmar')" style="margin-top: 10px;">Cancelar</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
