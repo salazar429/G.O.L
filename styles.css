@@ -5,10 +5,53 @@
 }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: linear-gradient(135deg, #1a202c 0%, #2d3748 100%);
     min-height: 100vh;
     color: #333;
+}
+
+/* Splash Screen */
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    transition: opacity 0.5s;
+}
+
+.splash-content {
+    text-align: center;
+    color: white;
+    animation: fadeInUp 1s;
+}
+
+.splash-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    animation: bounce 2s infinite;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-30px);}
+    60% {transform: translateY(-15px);}
+}
+
+.hidden {
+    opacity: 0;
+    pointer-events: none;
 }
 
 /* Contenedor principal */
@@ -16,7 +59,6 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-    min-height: 100vh;
 }
 
 .header {
@@ -24,7 +66,6 @@ body {
     border-radius: 15px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     display: flex;
     flex-direction: column;
     gap: 15px;
@@ -41,7 +82,6 @@ body {
 .header h1 {
     color: #667eea;
     font-size: 24px;
-    text-align: center;
 }
 
 .btn-add {
@@ -80,7 +120,6 @@ body {
     display: grid;
     grid-template-columns: 1fr;
     gap: 15px;
-    margin-top: 20px;
 }
 
 @media (min-width: 640px) {
@@ -93,7 +132,6 @@ body {
     background: white;
     border-radius: 15px;
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     cursor: pointer;
     transition: transform 0.3s;
     position: relative;
@@ -114,15 +152,6 @@ body {
     height: 30px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.3s;
-}
-
-.delete-btn:hover {
-    background: #c53030;
 }
 
 /* Ventana de obra */
@@ -148,8 +177,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    align-items: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     position: sticky;
     top: 0;
     z-index: 9001;
@@ -170,13 +197,6 @@ body {
 .obra-header-buttons {
     display: flex;
     gap: 10px;
-    width: 100%;
-}
-
-@media (min-width: 768px) {
-    .obra-header-buttons {
-        width: auto;
-    }
 }
 
 .btn-back {
@@ -187,7 +207,6 @@ body {
     border-radius: 25px;
     cursor: pointer;
     font-weight: 600;
-    flex: 1;
 }
 
 .obra-content {
@@ -202,15 +221,12 @@ body {
     background: white;
     padding: 10px;
     border-radius: 30px;
-    overflow-x: auto;
 }
 
 .tab {
     padding: 12px 20px;
     cursor: pointer;
     border-radius: 25px;
-    transition: all 0.3s;
-    white-space: nowrap;
     font-weight: 600;
 }
 
@@ -224,7 +240,6 @@ body {
     display: grid;
     grid-template-columns: 1fr;
     gap: 15px;
-    margin-top: 20px;
 }
 
 @media (min-width: 640px) {
@@ -237,7 +252,6 @@ body {
     background: white;
     border-radius: 15px;
     padding: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     border-left: 8px solid;
     position: relative;
 }
@@ -254,8 +268,6 @@ body {
     position: absolute;
     top: 10px;
     right: 10px;
-    display: flex;
-    gap: 5px;
 }
 
 .btn-icon {
@@ -264,12 +276,6 @@ body {
     font-size: 18px;
     cursor: pointer;
     padding: 5px;
-    border-radius: 5px;
-    transition: background 0.3s;
-}
-
-.btn-icon:hover {
-    background: #e2e8f0;
 }
 
 .btn-relacion {
@@ -279,8 +285,6 @@ body {
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
     margin-top: 10px;
     width: 100%;
 }
@@ -292,8 +296,6 @@ body {
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
     margin-top: 10px;
     width: 100%;
 }
@@ -322,13 +324,6 @@ body {
     padding: 25px;
     width: 90%;
     max-width: 500px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-content h2 {
-    color: #667eea;
-    margin-bottom: 20px;
 }
 
 .form-group {
@@ -342,210 +337,102 @@ body {
 }
 
 .form-group input,
-.form-group select,
-.form-group textarea {
+.form-group select {
     width: 100%;
     padding: 12px;
     border: 2px solid #e2e8f0;
     border-radius: 10px;
-    font-size: 16px;
 }
 
-.personaje-selector {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-    margin: 15px 0;
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.personaje-opcion {
-    background: #f7fafc;
-    border: 2px solid #e2e8f0;
-    border-radius: 10px;
-    padding: 10px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.personaje-opcion:hover {
-    border-color: #667eea;
-    transform: scale(1.05);
-}
-
-.personaje-opcion.masculino {
-    border-left: 5px solid #4299e1;
-}
-
-.personaje-opcion.femenino {
-    border-left: 5px solid #ed64a6;
-}
-
-/* Árbol de relaciones */
+/* Árbol genealógico */
 .arbol-container {
     background: #2d3748;
     border-radius: 15px;
     padding: 30px;
-    overflow-x: auto;
     min-height: 600px;
+    overflow-x: auto;
 }
 
-.red-relaciones {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
-    min-width: 800px;
-}
-
-.nodo-principal {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.conexiones-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 30px;
-    justify-content: center;
-    position: relative;
-}
-
-.relacion-grupo {
+.familia {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 15px;
-    min-width: 150px;
+    gap: 40px;
 }
 
-/* Iconos de persona */
-.personaje-icono {
+.generacion {
+    display: flex;
+    gap: 60px;
+    justify-content: center;
+}
+
+.personaje-nodo {
     width: 120px;
     background: white;
     border-radius: 15px;
-    padding: 15px 10px;
+    padding: 15px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: transform 0.3s;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    gap: 5px;
     position: relative;
 }
 
-.personaje-icono:hover {
-    transform: scale(1.05);
-    z-index: 10;
-}
-
-.personaje-icono.seleccionado {
-    box-shadow: 0 0 0 3px #fbbf24;
-}
-
-.personaje-icono.masculino {
+.personaje-nodo.masculino {
     border-top: 5px solid #4299e1;
 }
 
-.personaje-icono.femenino {
+.personaje-nodo.femenino {
     border-top: 5px solid #ed64a6;
 }
 
-.icono-persona {
+.icono {
     font-size: 40px;
 }
 
-.icono-persona.masculino {
+.icono.masculino {
     color: #4299e1;
 }
 
-.icono-persona.femenino {
+.icono.femenino {
     color: #ed64a6;
 }
 
-.personaje-icono .nombre {
+.nombre {
     font-weight: bold;
-    text-align: center;
     font-size: 14px;
+    text-align: center;
 }
 
-.personaje-icono .edad {
+.edad {
     font-size: 12px;
     color: #666;
 }
 
-/* Líneas de conexión */
-.linea-familiar { 
-    background: #48bb78; 
-}
-
-.linea-pareja { 
-    background: #ed64a6; 
-}
-
-.linea-amistad { 
-    background: #4299e1; 
-    border-top: 2px dashed #4299e1 !important;
-}
-
-.linea-enemistad { 
-    background: #f56565; 
-    border-top: 2px dashed #f56565 !important;
-}
-
-.linea-default { 
-    background: #718096; 
-    border-top: 2px dashed #718096 !important;
-}
-
-.linea-vertical {
+.linea-padre {
+    position: absolute;
+    top: -30px;
+    left: 50%;
     width: 2px;
-    height: 40px;
-    margin: 5px auto;
+    height: 30px;
+    background: #48bb78;
 }
 
-.linea-horizontal-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 10px 0;
-    width: 100%;
-}
-
-.linea-horizontal {
-    flex: 1;
+.linea-hermano {
+    position: absolute;
+    top: 50%;
+    right: -30px;
+    width: 30px;
     height: 2px;
+    background: #4299e1;
 }
 
-/* Líneas punteadas para ciertas relaciones */
-.linea-amistad.linea-horizontal,
-.linea-enemistad.linea-horizontal,
-.linea-default.linea-horizontal {
-    height: 0;
-    border-top: 2px dashed;
-    background: transparent;
-}
-
-.linea-amistad.linea-vertical,
-.linea-enemistad.linea-vertical,
-.linea-default.linea-vertical {
-    width: 2px;
-    height: 40px;
-    background: transparent;
-    border-left: 2px dashed;
-}
-
-/* Leyenda */
 .leyenda {
     background: white;
     border-radius: 10px;
     padding: 15px;
     margin-bottom: 20px;
     display: flex;
-    flex-wrap: wrap;
     gap: 20px;
     justify-content: center;
 }
@@ -554,23 +441,6 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
-    font-size: 14px;
-}
-
-.color-box {
-    width: 20px;
-    height: 20px;
-    border-radius: 4px;
-}
-
-.linea-muestra {
-    width: 30px;
-    height: 2px;
-}
-
-.linea-muestra.punteada {
-    height: 0;
-    border-top: 2px dashed;
 }
 
 .empty-message {
@@ -578,5 +448,4 @@ body {
     padding: 40px;
     background: white;
     border-radius: 15px;
-    color: #718096;
 }
