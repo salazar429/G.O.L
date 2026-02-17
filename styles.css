@@ -344,7 +344,7 @@ body {
     border-radius: 10px;
 }
 
-/* Árbol genealógico */
+    /* Árbol genealógico */
 .arbol-container {
     background: #2d3748;
     border-radius: 15px;
@@ -353,17 +353,27 @@ body {
     overflow-x: auto;
 }
 
-.familia {
+.arbol {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 40px;
+}
+
+.familia {
+    background: rgba(255,255,255,0.05);
+    border-radius: 15px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
 }
 
 .generacion {
     display: flex;
-    gap: 60px;
+    gap: 40px;
     justify-content: center;
+    flex-wrap: wrap;
+    position: relative;
 }
 
 .personaje-nodo {
@@ -416,15 +426,22 @@ body {
     width: 2px;
     height: 30px;
     background: #48bb78;
+    transform: translateX(-50%);
 }
 
 .linea-hermano {
     position: absolute;
     top: 50%;
-    right: -30px;
-    width: 30px;
+    right: -40px;
+    width: 40px;
     height: 2px;
     background: #4299e1;
+    transform: translateY(-50%);
+}
+
+/* Para el último hermano, no mostrar línea */
+.personaje-nodo:last-child .linea-hermano {
+    display: none;
 }
 
 .leyenda {
@@ -435,6 +452,7 @@ body {
     display: flex;
     gap: 20px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .leyenda-item {
